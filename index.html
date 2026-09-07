@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ICLABS — System Maintenance</title>
+  <meta name="description" content="ICLABS is currently undergoing scheduled system maintenance. We'll be back shortly.">
+  <meta name="theme-color" content="#0d1117">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    /* ========== CSS Variables ========== */
+    :root {
+      --color-bg: #0a0e14;
+      --color-bg-alt: #0d1117;
+      --color-teal: #5ba4b5;
+      --color-teal-bright: #6ec6d8;
+      --color-teal-dim: #3a7a8a;
+      --color-teal-glow: rgba(91, 164, 181, 0.15);
+      --color-teal-subtle: rgba(91, 164, 181, 0.06);
+      --color-text-primary: rgba(255, 255, 255, 0.92);
+      --color-text-secondary: rgba(255, 255, 255, 0.55);
+      --color-text-dim: rgba(255, 255, 255, 0.3);
+      --color-border: rgba(91, 164, 181, 0.2);
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+      --logo-size: min(320px, 55vw);
+      --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ========== Reset ========== */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* ========== Base ========== */
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: var(--font-sans);
+      background: var(--color-bg);
+      color: var(--color-text-primary);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ========== Main Container ========== */
+    .maintenance {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* ========== Background ========== */
+    .bg-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Subtle gradient background */
+    .bg-gradient {
+      background:
+        radial-gradient(ellipse 60% 50% at 50% 45%, var(--color-teal-glow) 0%, transparent 70%),
+        radial-gradient(ellipse 80% 60% at 50% 50%, rgba(91, 164, 181, 0.04) 0%, transparent 80%),
+        linear-gradient(180deg, var(--color-bg) 0%, var(--color-bg-alt) 50%, var(--color-bg) 100%);
+    }
+
+    /* Technical grid */
+    .bg-grid {
+      opacity: 0.025;
+      background-image:
+        linear-gradient(rgba(91, 164, 181, 0.5) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(91, 164, 181, 0.5) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 60% 55% at 50% 45%, black 0%, transparent 75%);
+      -webkit-mask-image: radial-gradient(ellipse 60% 55% at 50% 45%, black 0%, transparent 75%);
+    }
+
+    /* Particles canvas */
+    .bg-particles {
+      z-index: 1;
+    }
+
+    /* ========== Content ========== */
+    .content {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      padding: 20px;
+      max-width: 600px;
+      text-align: center;
+    }
+
+    /* ========== Logo Area ========== */
+    .logo-container {
+      position: relative;
+      width: var(--logo-size);
+      height: var(--logo-size);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 32px;
+    }
+
+    .logo-glow {
+      position: absolute;
+      width: 130%;
+      height: 130%;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--color-teal-glow) 0%, transparent 70%);
+      filter: blur(30px);
+      pointer-events: none;
+    }
+
+    .logo-img {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 0 20px rgba(91, 164, 181, 0.2));
+      z-index: 2;
+    }
+
+    /* SVG circuit overlay — positioned over the logo */
+    .circuit-overlay {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    /* Diagnostic ring */
+    .diagnostic-ring {
+      position: absolute;
+      width: 115%;
+      height: 115%;
+      top: -7.5%;
+      left: -7.5%;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    .diagnostic-ring circle {
+      fill: none;
+      stroke: var(--color-teal-dim);
+      stroke-width: 0.5;
+      stroke-dasharray: 8 12 3 8;
+    }
+
+    /* Scan line */
+    .scan-line {
+      position: absolute;
+      width: 120%;
+      height: 2px;
+      left: -10%;
+      top: 50%;
+      background: linear-gradient(90deg, transparent 0%, var(--color-teal-bright) 50%, transparent 100%);
+      opacity: 0;
+      z-index: 4;
+      pointer-events: none;
+      filter: blur(1px);
+    }
+
+    /* ========== Typography ========== */
+    .title {
+      font-size: clamp(14px, 2.5vw, 18px);
+      font-weight: 600;
+      letter-spacing: 0.35em;
+      color: var(--color-text-primary);
+      margin-bottom: 16px;
+      text-transform: uppercase;
+    }
+
+    .description {
+      font-size: clamp(13px, 1.8vw, 15px);
+      font-weight: 300;
+      line-height: 1.7;
+      color: var(--color-text-secondary);
+      margin-bottom: 28px;
+      max-width: 420px;
+    }
+
+    /* ========== Status Indicator ========== */
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: clamp(10px, 1.2vw, 11px);
+      color: var(--color-teal);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 32px;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--color-teal);
+      animation: statusPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes statusPulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 4px var(--color-teal); }
+      50% { opacity: 0.4; box-shadow: 0 0 8px var(--color-teal-bright); }
+    }
+
+    /* ========== Button ========== */
+    .btn-home {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 28px;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      color: var(--color-teal);
+      background: transparent;
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.35s var(--transition-smooth);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
+    .btn-home:hover,
+    .btn-home:focus-visible {
+      color: var(--color-teal-bright);
+      background: rgba(91, 164, 181, 0.06);
+      border-color: rgba(91, 164, 181, 0.35);
+      box-shadow: 0 0 20px rgba(91, 164, 181, 0.08);
+      outline: none;
+    }
+
+    .btn-home:focus-visible {
+      outline: 2px solid var(--color-teal);
+      outline-offset: 2px;
+    }
+
+    .btn-home svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+    }
+
+    /* ========== Phase Label (debug/subtle) ========== */
+    .phase-label {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--color-text-dim);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      z-index: 100;
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    /* ========== Reduced Motion ========== */
+    @media (prefers-reduced-motion: reduce) {
+      .status-dot {
+        animation: none;
+        opacity: 1;
+      }
+      .bg-grid {
+        opacity: 0.015;
+      }
+      .scan-line,
+      .diagnostic-ring,
+      .circuit-overlay,
+      .bg-particles {
+        display: none !important;
+      }
+      .logo-glow {
+        opacity: 0.5;
+      }
+    }
+
+    /* ========== Responsive ========== */
+    @media (max-width: 768px) {
+      :root {
+        --logo-size: min(240px, 60vw);
+      }
+      .logo-container {
+        margin-bottom: 24px;
+      }
+      .description {
+        margin-bottom: 20px;
+      }
+      .status {
+        margin-bottom: 24px;
+      }
+      .content {
+        padding: 16px;
+      }
+    }
+
+    @media (max-width: 390px) {
+      :root {
+        --logo-size: min(200px, 58vw);
+      }
+      .title {
+        letter-spacing: 0.25em;
+      }
+      .btn-home {
+        padding: 14px 28px;
+        font-size: 13px;
+      }
+    }
+
+    @media (min-width: 1440px) {
+      :root {
+        --logo-size: 360px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <main class="maintenance" role="main" aria-label="System Maintenance Page">
+
+    <!-- Background layers -->
+    <div class="bg-layer bg-gradient" aria-hidden="true"></div>
+    <div class="bg-layer bg-grid" aria-hidden="true"></div>
+    <canvas class="bg-layer bg-particles" aria-hidden="true"></canvas>
+
+    <!-- Content -->
+    <div class="content">
+
+      <!-- Logo hero -->
+      <div class="logo-container">
+        <div class="logo-glow" aria-hidden="true"></div>
+        <img
+          class="logo-img"
+          src="assets/iclabs-logo.png"
+          alt="ICLABS Logo — Integrated Circuit Laboratory"
+          width="320"
+          height="320"
+          draggable="false"
+        >
+
+        <!-- SVG circuit overlay for animation effects -->
+        <svg class="circuit-overlay" viewBox="0 0 320 320" aria-hidden="true">
+          <defs>
+            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+
+          <!-- Circuit pulse paths matching logo structure -->
+          <g class="circuit-paths" filter="url(#glow)">
+            <!-- Top traces -->
+            <line class="c-trace" x1="160" y1="80" x2="160" y2="30"/>
+            <line class="c-trace" x1="130" y1="85" x2="110" y2="45"/>
+            <line class="c-trace" x1="190" y1="85" x2="210" y2="45"/>
+            <line class="c-trace" x1="140" y1="90" x2="120" y2="55"/>
+            <line class="c-trace" x1="180" y1="90" x2="200" y2="55"/>
+
+            <!-- Right traces -->
+            <line class="c-trace" x1="240" y1="160" x2="290" y2="160"/>
+            <line class="c-trace" x1="235" y1="130" x2="275" y2="110"/>
+            <line class="c-trace" x1="235" y1="190" x2="275" y2="210"/>
+            <line class="c-trace" x1="240" y1="140" x2="265" y2="125"/>
+            <line class="c-trace" x1="240" y1="180" x2="265" y2="195"/>
+
+            <!-- Bottom traces -->
+            <line class="c-trace" x1="160" y1="240" x2="160" y2="290"/>
+            <line class="c-trace" x1="130" y1="235" x2="110" y2="275"/>
+            <line class="c-trace" x1="190" y1="235" x2="210" y2="275"/>
+            <line class="c-trace" x1="145" y1="240" x2="130" y2="270"/>
+            <line class="c-trace" x1="175" y1="240" x2="190" y2="270"/>
+
+            <!-- Left traces -->
+            <line class="c-trace" x1="80" y1="160" x2="30" y2="160"/>
+            <line class="c-trace" x1="85" y1="130" x2="45" y2="110"/>
+            <line class="c-trace" x1="85" y1="190" x2="45" y2="210"/>
+            <line class="c-trace" x1="80" y1="140" x2="55" y2="125"/>
+            <line class="c-trace" x1="80" y1="180" x2="55" y2="195"/>
+
+            <!-- Diagonal traces -->
+            <line class="c-trace" x1="100" y1="100" x2="55" y2="55"/>
+            <line class="c-trace" x1="220" y1="100" x2="265" y2="55"/>
+            <line class="c-trace" x1="100" y1="220" x2="55" y2="265"/>
+            <line class="c-trace" x1="220" y1="220" x2="265" y2="265"/>
+          </g>
+
+          <!-- Circuit nodes -->
+          <g class="circuit-nodes">
+            <!-- Outer nodes -->
+            <circle class="c-node c-node-outer" cx="160" cy="25" r="5"/>
+            <circle class="c-node c-node-outer" cx="108" cy="40" r="4"/>
+            <circle class="c-node c-node-outer" cx="212" cy="40" r="4"/>
+            <circle class="c-node c-node-outer" cx="295" cy="160" r="5"/>
+            <circle class="c-node c-node-outer" cx="280" cy="108" r="4"/>
+            <circle class="c-node c-node-outer" cx="280" cy="212" r="4"/>
+            <circle class="c-node c-node-outer" cx="160" cy="295" r="5"/>
+            <circle class="c-node c-node-outer" cx="108" cy="278" r="4"/>
+            <circle class="c-node c-node-outer" cx="212" cy="278" r="4"/>
+            <circle class="c-node c-node-outer" cx="25" cy="160" r="5"/>
+            <circle class="c-node c-node-outer" cx="40" cy="108" r="4"/>
+            <circle class="c-node c-node-outer" cx="40" cy="212" r="4"/>
+            <circle class="c-node c-node-outer" cx="50" cy="50" r="4"/>
+            <circle class="c-node c-node-outer" cx="270" cy="50" r="4"/>
+            <circle class="c-node c-node-outer" cx="50" cy="270" r="4"/>
+            <circle class="c-node c-node-outer" cx="270" cy="270" r="4"/>
+
+            <!-- Inner nodes (near chip edge) -->
+            <circle class="c-node c-node-inner" cx="118" cy="53" r="3"/>
+            <circle class="c-node c-node-inner" cx="202" cy="53" r="3"/>
+            <circle class="c-node c-node-inner" cx="267" cy="123" r="3"/>
+            <circle class="c-node c-node-inner" cx="267" cy="197" r="3"/>
+            <circle class="c-node c-node-inner" cx="128" cy="272" r="3"/>
+            <circle class="c-node c-node-inner" cx="192" cy="272" r="3"/>
+            <circle class="c-node c-node-inner" cx="53" cy="123" r="3"/>
+            <circle class="c-node c-node-inner" cx="53" cy="197" r="3"/>
+          </g>
+
+          <!-- Data pulse dots (animated along paths) -->
+          <g class="data-pulses">
+            <circle class="d-pulse" cx="160" cy="55" r="2"/>
+            <circle class="d-pulse" cx="265" cy="160" r="2"/>
+            <circle class="d-pulse" cx="160" cy="265" r="2"/>
+            <circle class="d-pulse" cx="55" cy="160" r="2"/>
+            <circle class="d-pulse" cx="135" cy="55" r="1.5"/>
+            <circle class="d-pulse" cx="265" cy="135" r="1.5"/>
+            <circle class="d-pulse" cx="185" cy="265" r="1.5"/>
+            <circle class="d-pulse" cx="55" cy="185" r="1.5"/>
+          </g>
+        </svg>
+
+        <!-- Diagnostic ring -->
+        <svg class="diagnostic-ring" viewBox="0 0 100 100" aria-hidden="true">
+          <circle cx="50" cy="50" r="48"/>
+        </svg>
+
+        <!-- Scan line -->
+        <div class="scan-line" aria-hidden="true"></div>
+      </div>
+
+      <!-- Text -->
+      <h1 class="title">System Maintenance</h1>
+      <p class="description">
+        ICLABS is currently undergoing scheduled maintenance.<br>
+        We'll be back shortly.
+      </p>
+
+      <!-- Status -->
+      <div class="status" role="status" aria-live="polite">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span class="status-text">System Maintenance in Progress</span>
+      </div>
+
+      <!-- Button -->
+      <a href="/" class="btn-home" aria-label="Return to ICLABS home page">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        Back to Home
+      </a>
+
+    </div>
+
+    <!-- Phase label -->
+    <div class="phase-label" aria-hidden="true">
+      <span class="phase-text">initializing</span>
+    </div>
+
+  </main>
+
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+  <script>
+    /* ========================================
+       ICLABS Maintenance — Animation Engine
+       ======================================== */
+    (function () {
+      'use strict';
+
+      /* ---------- Reduced Motion Check ---------- */
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      /* ---------- Particles (minimal) ---------- */
+      function initParticles() {
+        const canvas = document.querySelector('.bg-particles');
+        if (!canvas || prefersReducedMotion) return;
+
+        const ctx = canvas.getContext('2d');
+        let w, h;
+        const PARTICLE_COUNT = 25;
+        const particles = [];
+
+        function resize() {
+          w = canvas.width = window.innerWidth;
+          h = canvas.height = window.innerHeight;
+        }
+
+        function createParticle() {
+          return {
+            x: Math.random() * w,
+            y: Math.random() * h,
+            vx: (Math.random() - 0.5) * 0.15,
+            vy: (Math.random() - 0.5) * 0.15,
+            size: Math.random() * 1.2 + 0.3,
+            opacity: Math.random() * 0.25 + 0.05,
+            baseOpacity: 0,
+            pulse: Math.random() * Math.PI * 2
+          };
+        }
+
+        function init() {
+          resize();
+          particles.length = 0;
+          for (let i = 0; i < PARTICLE_COUNT; i++) {
+            const p = createParticle();
+            p.baseOpacity = p.opacity;
+            particles.push(p);
+          }
+        }
+
+        function draw() {
+          ctx.clearRect(0, 0, w, h);
+          for (const p of particles) {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.pulse += 0.008;
+            p.opacity = p.baseOpacity * (0.6 + 0.4 * Math.sin(p.pulse));
+
+            if (p.x < -10) p.x = w + 10;
+            if (p.x > w + 10) p.x = -10;
+            if (p.y < -10) p.y = h + 10;
+            if (p.y > h + 10) p.y = -10;
+
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(91, 164, 181, ${p.opacity})`;
+            ctx.fill();
+          }
+          requestAnimationFrame(draw);
+        }
+
+        init();
+        draw();
+        window.addEventListener('resize', resize, { passive: true });
+      }
+
+      /* ---------- Circuit Animation Styles ---------- */
+      function applyCircuitStyles() {
+        const traces = document.querySelectorAll('.c-trace');
+        const nodesOuter = document.querySelectorAll('.c-node-outer');
+        const nodesInner = document.querySelectorAll('.c-node-inner');
+        const pulses = document.querySelectorAll('.d-pulse');
+
+        traces.forEach(t => {
+          t.setAttribute('stroke', 'rgba(91, 164, 181, 0.35)');
+          t.setAttribute('stroke-width', '1');
+          t.setAttribute('stroke-linecap', 'round');
+        });
+
+        nodesOuter.forEach(n => {
+          n.setAttribute('fill', 'rgba(91, 164, 181, 0.15)');
+          n.setAttribute('stroke', 'rgba(91, 164, 181, 0.4)');
+          n.setAttribute('stroke-width', '0.8');
+        });
+
+        nodesInner.forEach(n => {
+          n.setAttribute('fill', 'rgba(91, 164, 181, 0.1)');
+          n.setAttribute('stroke', 'rgba(91, 164, 181, 0.3)');
+          n.setAttribute('stroke-width', '0.6');
+        });
+
+        pulses.forEach(p => {
+          p.setAttribute('fill', 'rgba(110, 198, 216, 0.6)');
+          p.setAttribute('opacity', '0');
+        });
+      }
+
+      /* ---------- GSAP Maintenance Animation ---------- */
+      function initMainAnimation() {
+        if (prefersReducedMotion) {
+          document.querySelector('.phase-text').textContent = 'maintenance active';
+          return;
+        }
+
+        const tl = gsap.timeline({ repeat: -1, defaults: { ease: 'power2.inOut' } });
+
+        const traces = gsap.utils.toArray('.c-trace');
+        const nodesOuter = gsap.utils.toArray('.c-node-outer');
+        const nodesInner = gsap.utils.toArray('.c-node-inner');
+        const pulses = gsap.utils.toArray('.d-pulse');
+        const logoGlow = document.querySelector('.logo-glow');
+        const logoImg = document.querySelector('.logo-img');
+        const diagRing = document.querySelector('.diagnostic-ring');
+        const diagCircle = diagRing.querySelector('circle');
+        const scanLine = document.querySelector('.scan-line');
+        const phaseText = document.querySelector('.phase-text');
+
+        /* --- Phase 1: System Online (~3s) --- */
+        tl.addLabel('phase1', 0);
+
+        tl.call(() => { phaseText.textContent = 'system online'; }, null, 'phase1');
+
+        // Traces glow up softly
+        tl.to(traces, {
+          attr: { stroke: 'rgba(91, 164, 181, 0.5)' },
+          duration: 0.8,
+          stagger: { each: 0.03, from: 'random' }
+        }, 'phase1');
+
+        // Outer nodes activate
+        tl.to(nodesOuter, {
+          attr: { fill: 'rgba(91, 164, 181, 0.4)', stroke: 'rgba(110, 198, 216, 0.6)' },
+          duration: 0.6,
+          stagger: { each: 0.05, from: 'center' }
+        }, 'phase1+=0.3');
+
+        // Inner nodes activate
+        tl.to(nodesInner, {
+          attr: { fill: 'rgba(91, 164, 181, 0.3)', stroke: 'rgba(110, 198, 216, 0.5)' },
+          duration: 0.5,
+          stagger: 0.04
+        }, 'phase1+=0.5');
+
+        // Subtle pulse from center
+        tl.fromTo(pulses.slice(0, 4), {
+          opacity: 0
+        }, {
+          opacity: 0.7,
+          duration: 0.4,
+          stagger: 0.1
+        }, 'phase1+=1');
+
+        tl.to(pulses.slice(0, 4), {
+          opacity: 0,
+          duration: 0.5,
+          stagger: 0.1
+        }, 'phase1+=1.8');
+
+        // Logo glow breathe
+        tl.to(logoGlow, {
+          opacity: 1.1,
+          scale: 1.05,
+          duration: 1.5
+        }, 'phase1');
+
+        tl.to(logoGlow, {
+          opacity: 0.9,
+          scale: 1,
+          duration: 1.5
+        }, 'phase1+=1.5');
+
+        /* --- Phase 2: Diagnostic (~3s) --- */
+        tl.addLabel('phase2', 3);
+
+        tl.call(() => { phaseText.textContent = 'diagnostic'; }, null, 'phase2');
+
+        // Scan line sweeps top to bottom
+        tl.set(scanLine, { top: '0%', opacity: 0 }, 'phase2');
+        tl.to(scanLine, {
+          opacity: 0.6,
+          duration: 0.3
+        }, 'phase2');
+        tl.to(scanLine, {
+          top: '100%',
+          duration: 2.2,
+          ease: 'power1.inOut'
+        }, 'phase2+=0.2');
+        tl.to(scanLine, {
+          opacity: 0,
+          duration: 0.3
+        }, 'phase2+=2.2');
+
+        // Nodes light up sequentially
+        tl.to(nodesOuter, {
+          attr: { fill: 'rgba(110, 198, 216, 0.6)', stroke: 'rgba(110, 198, 216, 0.8)' },
+          duration: 0.15,
+          stagger: { each: 0.12, from: 'start' }
+        }, 'phase2+=0.3');
+
+        // Data pulses flow along traces
+        tl.to(pulses, {
+          opacity: 0.8,
+          duration: 0.3,
+          stagger: { each: 0.15, from: 'edges' }
+        }, 'phase2+=0.5');
+
+        tl.to(pulses, {
+          opacity: 0,
+          duration: 0.4,
+          stagger: 0.12
+        }, 'phase2+=1.5');
+
+        // Logo gets slightly brighter during scan
+        tl.to(logoImg, {
+          filter: 'drop-shadow(0 0 25px rgba(91, 164, 181, 0.35))',
+          duration: 1
+        }, 'phase2');
+
+        tl.to(logoImg, {
+          filter: 'drop-shadow(0 0 20px rgba(91, 164, 181, 0.2))',
+          duration: 1
+        }, 'phase2+=2');
+
+        /* --- Phase 3: Maintenance Mode (~3s) --- */
+        tl.addLabel('phase3', 6);
+
+        tl.call(() => { phaseText.textContent = 'maintenance mode'; }, null, 'phase3');
+
+        // Nodes deactivate sequentially (controlled shutdown)
+        tl.to(nodesOuter, {
+          attr: { fill: 'rgba(91, 164, 181, 0.1)', stroke: 'rgba(91, 164, 181, 0.25)' },
+          duration: 0.25,
+          stagger: { each: 0.1, from: 'edges' }
+        }, 'phase3+=0.2');
+
+        tl.to(nodesInner, {
+          attr: { fill: 'rgba(91, 164, 181, 0.05)', stroke: 'rgba(91, 164, 181, 0.15)' },
+          duration: 0.3,
+          stagger: 0.06
+        }, 'phase3+=0.4');
+
+        // Traces dim
+        tl.to(traces, {
+          attr: { stroke: 'rgba(91, 164, 181, 0.2)' },
+          duration: 0.8,
+          stagger: { each: 0.02, from: 'random' }
+        }, 'phase3+=0.3');
+
+        // Diagnostic ring appears and rotates
+        tl.to(diagRing, {
+          opacity: 0.5,
+          duration: 0.6
+        }, 'phase3+=0.5');
+
+        tl.to(diagCircle, {
+          rotation: 180,
+          transformOrigin: '50% 50%',
+          duration: 2.4,
+          ease: 'none'
+        }, 'phase3+=0.5');
+
+        // Glow dims slightly
+        tl.to(logoGlow, {
+          opacity: 0.6,
+          scale: 0.95,
+          duration: 1.5
+        }, 'phase3');
+
+        // Logo dims slightly
+        tl.to(logoImg, {
+          filter: 'drop-shadow(0 0 12px rgba(91, 164, 181, 0.12)) brightness(0.92)',
+          duration: 1.5
+        }, 'phase3');
+
+        /* --- Phase 4: Optimization (~3s) --- */
+        tl.addLabel('phase4', 9);
+
+        tl.call(() => { phaseText.textContent = 'optimization'; }, null, 'phase4');
+
+        // Energy pulses converge to center
+        tl.fromTo(pulses, {
+          opacity: 0
+        }, {
+          opacity: 0.9,
+          duration: 0.3,
+          stagger: { each: 0.08, from: 'edges' }
+        }, 'phase4');
+
+        tl.to(pulses, {
+          opacity: 0,
+          duration: 0.5,
+          stagger: 0.1
+        }, 'phase4+=1');
+
+        // Nodes re-activate one by one
+        tl.to(nodesInner, {
+          attr: { fill: 'rgba(91, 164, 181, 0.3)', stroke: 'rgba(110, 198, 216, 0.5)' },
+          duration: 0.2,
+          stagger: { each: 0.1, from: 'center' }
+        }, 'phase4+=0.5');
+
+        tl.to(nodesOuter, {
+          attr: { fill: 'rgba(91, 164, 181, 0.35)', stroke: 'rgba(110, 198, 216, 0.55)' },
+          duration: 0.2,
+          stagger: { each: 0.08, from: 'center' }
+        }, 'phase4+=0.8');
+
+        // Traces brighten
+        tl.to(traces, {
+          attr: { stroke: 'rgba(91, 164, 181, 0.45)' },
+          duration: 0.6,
+          stagger: { each: 0.02, from: 'center' }
+        }, 'phase4+=0.8');
+
+        // Diagnostic ring fades
+        tl.to(diagRing, {
+          opacity: 0,
+          duration: 0.8
+        }, 'phase4+=1');
+
+        // Glow returns
+        tl.to(logoGlow, {
+          opacity: 0.9,
+          scale: 1,
+          duration: 1.5
+        }, 'phase4+=0.5');
+
+        // Logo brightens
+        tl.to(logoImg, {
+          filter: 'drop-shadow(0 0 18px rgba(91, 164, 181, 0.2)) brightness(1)',
+          duration: 1.5
+        }, 'phase4+=0.5');
+
+        /* --- Phase 5: System Restored (~2-3s) --- */
+        tl.addLabel('phase5', 12);
+
+        tl.call(() => { phaseText.textContent = 'system restored'; }, null, 'phase5');
+
+        // All nodes fully active
+        tl.to(nodesOuter, {
+          attr: { fill: 'rgba(110, 198, 216, 0.5)', stroke: 'rgba(110, 198, 216, 0.7)' },
+          duration: 0.4,
+          stagger: { each: 0.03, from: 'center' }
+        }, 'phase5');
+
+        tl.to(nodesInner, {
+          attr: { fill: 'rgba(110, 198, 216, 0.4)', stroke: 'rgba(110, 198, 216, 0.6)' },
+          duration: 0.3,
+          stagger: 0.03
+        }, 'phase5+=0.2');
+
+        // All traces bright
+        tl.to(traces, {
+          attr: { stroke: 'rgba(110, 198, 216, 0.55)' },
+          duration: 0.5,
+          stagger: { each: 0.015, from: 'center' }
+        }, 'phase5+=0.2');
+
+        // Final elegant pulse
+        tl.fromTo(pulses, {
+          opacity: 0
+        }, {
+          opacity: 1,
+          duration: 0.25,
+          stagger: { each: 0.06, from: 'center' }
+        }, 'phase5+=0.5');
+
+        tl.to(pulses, {
+          opacity: 0,
+          duration: 0.6,
+          stagger: 0.05
+        }, 'phase5+=1.2');
+
+        // Logo glow peaks
+        tl.to(logoGlow, {
+          opacity: 1.2,
+          scale: 1.08,
+          duration: 0.8
+        }, 'phase5+=0.4');
+
+        tl.to(logoImg, {
+          filter: 'drop-shadow(0 0 28px rgba(91, 164, 181, 0.3))',
+          duration: 0.8
+        }, 'phase5+=0.4');
+
+        // Settle back to baseline for seamless loop
+        tl.to(logoGlow, {
+          opacity: 0.85,
+          scale: 1,
+          duration: 1
+        }, 'phase5+=1.5');
+
+        tl.to(logoImg, {
+          filter: 'drop-shadow(0 0 20px rgba(91, 164, 181, 0.2))',
+          duration: 1
+        }, 'phase5+=1.5');
+
+        // Settle nodes/traces to baseline
+        tl.to(traces, {
+          attr: { stroke: 'rgba(91, 164, 181, 0.35)' },
+          duration: 0.8,
+          stagger: { each: 0.01, from: 'random' }
+        }, 'phase5+=1.8');
+
+        tl.to(nodesOuter, {
+          attr: { fill: 'rgba(91, 164, 181, 0.15)', stroke: 'rgba(91, 164, 181, 0.4)' },
+          duration: 0.8,
+          stagger: { each: 0.02, from: 'random' }
+        }, 'phase5+=1.8');
+
+        tl.to(nodesInner, {
+          attr: { fill: 'rgba(91, 164, 181, 0.1)', stroke: 'rgba(91, 164, 181, 0.3)' },
+          duration: 0.8,
+          stagger: 0.02
+        }, 'phase5+=1.8');
+
+        // Reset phase text before loop restart
+        tl.call(() => { phaseText.textContent = 'system online'; }, null, '+=0.1');
+      }
+
+      /* ---------- Entrance Animation ---------- */
+      function initEntrance() {
+        if (prefersReducedMotion) return;
+
+        const content = document.querySelector('.content');
+        const logoContainer = document.querySelector('.logo-container');
+        const title = document.querySelector('.title');
+        const description = document.querySelector('.description');
+        const status = document.querySelector('.status');
+        const btn = document.querySelector('.btn-home');
+        const phaseLabel = document.querySelector('.phase-label');
+
+        gsap.set([logoContainer, title, description, status, btn, phaseLabel], {
+          opacity: 0,
+          y: 15
+        });
+
+        const entrance = gsap.timeline({ delay: 0.3 });
+
+        entrance.to(logoContainer, {
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          ease: 'power3.out'
+        });
+
+        entrance.to(title, {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: 'power2.out'
+        }, '-=0.4');
+
+        entrance.to(description, {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: 'power2.out'
+        }, '-=0.3');
+
+        entrance.to(status, {
+          opacity: 1,
+          y: 0,
+          duration: 0.5,
+          ease: 'power2.out'
+        }, '-=0.2');
+
+        entrance.to(btn, {
+          opacity: 1,
+          y: 0,
+          duration: 0.5,
+          ease: 'power2.out'
+        }, '-=0.2');
+
+        entrance.to(phaseLabel, {
+          opacity: 0.4,
+          y: 0,
+          duration: 0.4,
+          ease: 'power2.out'
+        }, '-=0.2');
+      }
+
+      /* ---------- Init ---------- */
+      function init() {
+        applyCircuitStyles();
+        initParticles();
+        initEntrance();
+        initMainAnimation();
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+    })();
+  </script>
+
+</body>
+</html>
